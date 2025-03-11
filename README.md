@@ -24,8 +24,8 @@ Admin Insurance helps organizations manage employee documentation processes acro
 ## Getting Started
 
 ### Prerequisites
-- Node.js (v18 or higher)
-- npm (v9 or higher)
+- Node.js (v21.1.0 or higher)
+- npm (v10.2.0 or higher)
 
 ### Installation
 1. Clone the repository:

@@ -3,7 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-import {router} from './routers/router.js';
+import { router } from './routers/router.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 

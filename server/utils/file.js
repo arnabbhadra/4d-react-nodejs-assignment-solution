@@ -36,7 +36,7 @@ const convertFromTxt = function (filePath) {
             let result = null;
             const lineCount = lines.length;
             // Loop over each line ignoring the header
-            for( let index = 1; index<lineCount; index++){
+            for (let index = 1; index < lineCount; index++) {
                 const line = lines[index];
                 // extract the information
                 const parts = line.split(/\s+/).filter(part => part !== '');
@@ -66,7 +66,7 @@ const convertFromTxt = function (filePath) {
                     };
                     results.push(item)
                 }
-                else{
+                else {
                     reject(Error('Some data is missing. Please check the file'))
                 }
             };

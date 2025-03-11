@@ -55,7 +55,7 @@ npm run server     # Backend only
 
 ## Project Structure
 ```
-admin-insurance/
+4d-react-node-assignment-solution/
 ├── src/                    # Frontend source code
 │   ├── components/         # Reusable components
 │   ├── pages/             # Page components
@@ -119,5 +119,71 @@ Your submission will be evaluated based on:
 While you may use AI tools like ChatGPT or GitHub Copilot for assistance, ensure that you fully understand and can explain all code implementations. The core solution should reflect your technical thinking and problem-solving approach.
 
 ## Documentation  
+  In the submission we have solved **JIRA-301** and **JIRA-302**. Both are backend issues where we have created a new **end point** to upload file (csv and txt only) and parse the data and store it (JIRA-301). Also we have implement **advance search** of the submission by modifying an existing api (JIRA-302). Before going deep into the solution, we have restructured the `/server/` folder.  
+  use `main` brach of this repo.
+  ### Backend server structure
+ ``` 
+4d-react-node-assignment-solution/
+├── src/                   # Frontend source code
+├── server/                # Backend server code
+│     ├── controllers      # controllers
+│     ├── middleware       # Middlewares
+│     ├── routers          # all routes comes here
+│     ├── services         # service codes
+│     ├── utils            # utility functions 
+│     └── index.js         # main application server
+│ 
+├── tests/                 # Test files
+├── uploads/               # Stroing uploaded files
+└── tickets/               # Implementation tickets
+```
 
-Your **detailed documentation** should go here, outlining how you approached each challenge. The more detailed, the better—it helps us understand your thought process and decision-making.  
+### JIRA-301
+  A new API end point is created which takes a file CSV or TXT file as input and process, validate and parse and finally store the information.
+  ```
+  POST /api/upload
+  ```
+
+  A NPM package multer is used for file upload.
+  A middleware `fileMiddleware` is created for handling file upload and after that `upLoadFileAndParse` is used to parse the file, validate and insert of new record by using `convertFromTxt`, `convertFromCSV` and `insertSubmissionsInBulk` utils and services.
+  Form the file extension, the file type is identified.
+  We have also validate the Header and mapped the header with the stored key by `headerToFieldMapper` utility function.
+  `handleFileUploadError` middleware is used to handle the error during file upload
+
+### JIRA-302
+  To solve this issue, ```/api/submission``` api is modiled with a query param `search_text`
+  Example.
+  ```
+  GET /api/submissions?search_text=startDate:2020-01-01..2020-01-01
+
+  GET /api/submissions?search_text=John
+
+  GET /api/submissions
+  ``` 
+  If you look into the `searchSubmissions` controller, you can find that if `search_text` query parameter is not provided then filter is disabled and all submissions is returned.
+  To validate user input (date) and date range, `checkDateFormat`, `isDateInDateRange` functions are used heavily. 
+  Note: The search is **Case Sensitive**.
+  ### More Information
+  It is necessary to mention that `router` are used for code maintainability is used in application. Ex.
+  ```
+  app.use('/api', router);
+  ```
+  A middleware is used to application level variable make available in request object to make it available in controller with out passing it separately as a separate function parameter.
+
+  ``` bash
+  # middleware
+  app.use((req, res, next) => {
+    req.submissions = submissions;
+    next();
+  });
+  ```
+### Documentation Folder
+In `4d-react-node-assignment-solution/documentation` folder sample csv and text file is shared as well as postman collection is provided in the same folder for reference.
+
+#### Author
+This solution is submitted by **Arnab Bhadra**
+You can reach me at (+91) 8105816631 or mail me at arnab.bhadra29@gmail.com
+
+
+  
+

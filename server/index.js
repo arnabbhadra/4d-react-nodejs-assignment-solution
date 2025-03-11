@@ -81,13 +81,14 @@ app.post('/api/submit', (req, res) => {
   res.json({ data: formData });
 });
 
-app.get('/api/submissions', (req, res) => {
-  res.json(submissions);
-});
 // advanced search filter api
-app.get('/api/submissions/search', (req, res) => {
+app.get('/api/submissions', (req, res) => {
   try{
+    
     const searchField = req.query.search_text;
+    if(!searchField){
+      res.json(submissions);
+    }
     const filteredSubmissions = filterSubmission(submissions, searchField);
     res.json(filteredSubmissions);
   }

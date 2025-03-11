@@ -3,7 +3,8 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-import filterSubmission from "./services/service.js";
+import {filterSubmission, fileParser, insertSubmissionsInBulk} from "./services/service.js";
+import {upload, handleFileUploadError} from "./middleware/fileMiddleware.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -90,12 +91,28 @@ app.get('/api/submissions', (req, res) => {
       res.json(submissions);
     }
     const filteredSubmissions = filterSubmission(submissions, searchField);
-    res.json(filteredSubmissions);
+    return res.json(filteredSubmissions);
   }
   catch(error){
-    res.status(400).send({message: error.message});
+    return res.status(400).send({message: error.message});
   }
 });
+// upload file api end point
+app.post('/api/upload', upload.single('file'), async (req, res) =>{
+  try{
+    if (!req.file) {
+      return res.status(400).send({message: 'Error in File upload'});
+    }
+    // read file parse into json array
+    const results = await fileParser(req.file.path);
+    //insert data into list
+    await insertSubmissionsInBulk(submissions, results);
+    return res.json(submissions);
+  }
+  catch(error){
+    return res.status(400).send({message: error.message});
+  }
+}, handleFileUploadError)
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));
 });

@@ -1,7 +1,11 @@
-// this function apply filter on the submissions
-// input: submissions and search text
-import { checkDateFormat, isDateInDateRange } from './../utils/date.js'
 
+import { checkDateFormat, isDateInDateRange } from './../utils/date.js'
+import { readFile, convertFromCSV, convertFromTxt } from '../utils/file.js';
+import { headerToFieldMapper } from './../utils/utils.js'
+import path from 'path';
+import { v4 as uuidv4 } from 'uuid';
+// Function to apply filter on the submissions
+// input: submissions and search text
 const filterSubmission = function(submissions, searchText){
     try{
         let finalResult = [];
@@ -56,4 +60,38 @@ const filterSubmission = function(submissions, searchText){
     }
 }
 
-export default filterSubmission
+// Function to Parse file provided the file path
+const fileParser = async function(filePath){
+    try{
+        const content = await readFile(filePath);
+        const extName = path.extname(filePath);
+        // read csv data and parse
+        let results =[];
+        // based on the extension of file parser is chosen
+        if(extName == '.txt'){
+            results = await convertFromTxt(filePath);
+        }
+        else if(extName == '.csv'){
+            results = await convertFromCSV(filePath);
+        }
+        return results;
+    }
+    catch(error){
+        throw error;
+    }
+}
+const insertSubmissionsInBulk = async function(submissions,results){
+    try{
+        
+        for(const item of results){
+            const newSubmission = headerToFieldMapper(item);
+            submissions.push({...newSubmission, id: uuidv4(), privacyConsent: false});
+        }
+        return submissions;
+    }
+    catch(error){
+        throw error;
+    }
+
+} 
+export { filterSubmission, fileParser, insertSubmissionsInBulk }

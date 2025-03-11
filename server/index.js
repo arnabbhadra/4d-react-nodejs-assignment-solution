@@ -3,7 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-import filterSubmission from "./services/service.js";
+import {router} from './routers/router.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -70,6 +70,11 @@ let submissions = [
   },
 ];
 
+app.use((req, res, next) => {
+  req.submissions = submissions;
+  next();
+});
+
 app.use(express.static(join(__dirname, '../dist')));
 
 app.post('/api/submit', (req, res) => {
@@ -81,21 +86,8 @@ app.post('/api/submit', (req, res) => {
   res.json({ data: formData });
 });
 
-// advanced search filter api
-app.get('/api/submissions', (req, res) => {
-  try{
-    
-    const searchField = req.query.search_text;
-    if(!searchField){
-      res.json(submissions);
-    }
-    const filteredSubmissions = filterSubmission(submissions, searchField);
-    res.json(filteredSubmissions);
-  }
-  catch(error){
-    res.status(400).send({message: error.message});
-  }
-});
+app.use('/api', router);
+
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));
 });

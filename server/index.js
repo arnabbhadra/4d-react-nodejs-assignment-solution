@@ -3,8 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-import {filterSubmission, fileParser, insertSubmissionsInBulk} from "./services/service.js";
-import {upload, handleFileUploadError} from "./middleware/fileMiddleware.js";
+import {router} from './routers/router.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -71,6 +70,11 @@ let submissions = [
   },
 ];
 
+app.use((req, res, next) => {
+  req.submissions = submissions;
+  next();
+});
+
 app.use(express.static(join(__dirname, '../dist')));
 
 app.post('/api/submit', (req, res) => {
@@ -82,37 +86,8 @@ app.post('/api/submit', (req, res) => {
   res.json({ data: formData });
 });
 
-// advanced search filter api
-app.get('/api/submissions', (req, res) => {
-  try{
-    
-    const searchField = req.query.search_text;
-    if(!searchField){
-      res.json(submissions);
-    }
-    const filteredSubmissions = filterSubmission(submissions, searchField);
-    return res.json(filteredSubmissions);
-  }
-  catch(error){
-    return res.status(400).send({message: error.message});
-  }
-});
-// upload file api end point
-app.post('/api/upload', upload.single('file'), async (req, res) =>{
-  try{
-    if (!req.file) {
-      return res.status(400).send({message: 'Error in File upload'});
-    }
-    // read file parse into json array
-    const results = await fileParser(req.file.path);
-    //insert data into list
-    await insertSubmissionsInBulk(submissions, results);
-    return res.json(submissions);
-  }
-  catch(error){
-    return res.status(400).send({message: error.message});
-  }
-}, handleFileUploadError)
+app.use('/api', router);
+
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));
 });

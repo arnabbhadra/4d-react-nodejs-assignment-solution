@@ -3,7 +3,7 @@ import cors from 'cors';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import dotenv from 'dotenv';
-
+import filterSubmission from "./services/service.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -84,7 +84,17 @@ app.post('/api/submit', (req, res) => {
 app.get('/api/submissions', (req, res) => {
   res.json(submissions);
 });
-
+// advanced search filter api
+app.get('/api/submissions/search', (req, res) => {
+  try{
+    const searchField = req.query.search_text;
+    const filteredSubmissions = filterSubmission(submissions, searchField);
+    res.json(filteredSubmissions);
+  }
+  catch(error){
+    res.status(400).send({message: error.message});
+  }
+});
 app.get('*', (req, res) => {
   res.sendFile(join(__dirname, '../dist/index.html'));
 });

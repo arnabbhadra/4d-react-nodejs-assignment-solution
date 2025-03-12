@@ -31,7 +31,7 @@ Admin Insurance helps organizations manage employee documentation processes acro
 1. Clone the repository:
 ```bash
 git clone [repository-url]
-cd admin-insurance
+cd 4d-react-node-assignment-solution
 ```
 
 2. Install dependencies:
